@@ -15,7 +15,8 @@ App.config(['$routeProvider',function($routeProvider) {
 	})
 }])
 App.controller('AddUserCtrl',function($scope,webservice){
-	Logging_Succ=false
+	$scope.emailexists=false;
+	$scope.Reg_Succ=false
 	$scope.userFields=[
 	{
 		name:'firstname',
@@ -45,11 +46,25 @@ App.controller('AddUserCtrl',function($scope,webservice){
 	$scope.FormVal={}
 	$scope.postForm=function(){
 		webservice.postForm(JSON.stringify($scope.FormVal),'api/user').then(function(data){
-			$scope.Logging_Succ=true;
+			$scope.Reg_Succ=true;
 		},function(data){
 			alert(JSON.stringify(data))
 		})
 	}
+	//$scope.checkemail=function(){
+	$scope.$watch('FormVal.email',function(email){
+		if(email){
+			var url='api/finduser?email='+email
+			webservice.getUser(url).then(function(data){
+				if(data.data.success){
+					$scope.emailexists=true;
+				}else{
+					$scope.emailexists=false;
+				}
+			})
+		}
+	})
+	//}
 })
 App.controller('LoginCtrl',function($scope,webservice,userfactory){
 	$scope.user={}

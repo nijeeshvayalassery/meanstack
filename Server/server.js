@@ -48,8 +48,6 @@ router.route('/user').post(function(req, res) {
 	  		});
 		}
 	});
-}).get(function(req,res){
-	res.json({ message: 'Got a Get' });
 })
 router.route('/login').post(function(req,res){
 	var email=req.body.email;
@@ -70,11 +68,9 @@ router.route('/login').post(function(req,res){
 			}
 		}
 	})
-
 })
 router.route('/finduser').get(function(req,res){
-	console.log('GOTCHAAAAAAAAAAAAAAAA')
-	var email=req.email;
+	var email=req.query.email;
 	Bear.findOne(
 			{'email':email},{'password':false},function(err,person){
 		if(err){

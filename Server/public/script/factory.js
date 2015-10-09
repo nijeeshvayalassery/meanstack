@@ -24,6 +24,15 @@ Appfactory.factory('webservice', ['$http','$q', function($http,$q){
 				deff.reject(err)
 			})
 			return deff.promise
+		},
+		getUser:function(url){
+			var deff=$q.defer()
+			$http.get(url).then(function(response){
+				deff.resolve(response)
+			}).then(function(err){
+				deff.reject(err)
+			})
+			return deff.promise
 		}
 	};
 }])
