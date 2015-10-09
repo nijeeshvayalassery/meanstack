@@ -1,56 +1,74 @@
-var App=angular.module('UserRegApp', ['ngRoute'])
+var App=angular.module('UserRegApp', ['ngRoute','directives','factories'])
 App.config(['$routeProvider',function($routeProvider) {
 	$routeProvider.when('/addUser', {
 		templateUrl:'Templates/AddUser.html',
 		controller:'AddUserCtrl'
+	}).when('/login',{
+		templateUrl:'Templates/Login.html',
+		controller:'LoginCtrl'
+	}).when('/home',{
+		templateUrl:'Templates/userhome.html',
+		controller:'HomeCtrl'
 	}).otherwise({
 		templateUrl:'Templates/NotFound.html',
 		controller:'AddUserCtrl'
 	})
 }])
 App.controller('AddUserCtrl',function($scope,webservice){
+	Logging_Succ=false
 	$scope.userFields=[
 	{
 		name:'firstname',
-		label:'First Name', 
+		label:'First Name',
+		type:'text',
+		required:true
 	},
 	{
 		name:'lastname',
-		label:'Last Name'
+		label:'Last Name',
+		type:'text',
+		required:false
 	},
 	{
 		name:'email',
-		label:'Email Id' 
+		label:'Email Id',
+		type:'email',
+		required:false 
 	},
 	{
 		name:'mobile',
-		label:'Mobile'
+		label:'Mobile',
+		type:'text',
+		required:false
 	}
 	]
 	$scope.FormVal={}
 	$scope.postForm=function(){
-		alert(JSON.stringify($scope.FormVal))
-		webservice.postForm(JSON.stringify($scope.FormVal)).then(function(data){
-			alert('OK')
-			alert(JSON.stringify(data))
+		webservice.postForm(JSON.stringify($scope.FormVal),'api/user').then(function(data){
+			$scope.Logging_Succ=true;
 		},function(data){
-			alert('error')
 			alert(JSON.stringify(data))
 		})
 	}
 })
-App.factory('webservice', ['$http','$q', function($http,$q){
-	return {
-		enduri:'api/user',
-		postForm:function(data){
-			alert(this.enduri)
-			var deff=$q.defer()
-			$http.post("api/user",data).then(function(response){
-				deff.resolve(response)
-			}).then(function(err){
-				deff.reject(err)
-			})
-			return deff.promise
-		}
-	};
-}])
+App.controller('LoginCtrl',function($scope,webservice,userfactory){
+	$scope.user={}
+	$scope.doLogin=function(){
+		webservice.postForm(JSON.stringify($scope.user),'api/login').then(function(data){
+			if(data.data.success){
+				//alert(JSON.stringify(data.data.user))
+				userfactory.setuser(data.data.user)
+				$scope.LogFailed=false;
+			}else{
+				$scope.LogFailed=true;
+				//alert('invalid login')
+			}
+		},function(err){
+			alert(JSON.stringify(data))
+		})
+	}
+})
+App.controller('HomeCtrl',function($scope,userfactory){
+	alert(JSON.stringify(userfactory.getcurrentuser()))
+	$scope.user=userfactory.getcurrentuser();
+})
